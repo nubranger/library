@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create new Book{% endblock %}
+
+{% block body %}
+    <h1>Create new Book</h1>
+
+    <form action="{{ path('book_store') }}" method="POST">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="book_title" class="form-label">Title</label>
+                <input class="form-control" type="text" name="book_title" id="book_title">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="book_isbn" class="form-label">ISBN</label>
+                <input class="form-control" type="text" name="book_isbn" id="book_isbn">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="book_author" class="form-label">Author</label>
+                <select name="book_author_id" id="book_author" class="form-select">
+                    {% for author in authors %}
+                    <option value="{{ author.id }}">{{ author.name }} {{ author.surname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="book_pages" class="form-label">Pages</label>
+                <input class="form-control" type="text" name="book_pages" id="book_pages">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="book_about" class="form-label">About</label>
+                <input class="form-control" type="text" name="book_about" id="book_about">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="btn-group" role="group">
+                    <button type="submit" class="btn btn-outline-primary me-2">Add</button>
+                    <a class="btn btn-outline-dark me-2" href="{{ path('book_index') }}">Back</a>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

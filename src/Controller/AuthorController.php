@@ -20,7 +20,6 @@ class AuthorController extends AbstractController
             ->findAll();
 
         return $this->render('author/index.html.twig', [
-            'controller_name' => 'AuthorController',
             'authors' => $authors
         ]);
     }
@@ -58,6 +57,7 @@ class AuthorController extends AbstractController
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
             ->find($id);
+
 
         return $this->render('author/edit.html.twig', [
             'author' => $author
