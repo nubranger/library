@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Books list{% endblock %}
+
+{% block body %}
+    <h1>{{ author.name }} {{ author.surname }} Books</h1>
+    <table class="table table-success table-striped">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Title</th>
+            <th scope="col">ISBN</th>
+            <th scope="col">Pages</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ book.title }}</td>
+                <td>{{ book.isbn }}</td>
+                <td>{{ book.pages }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+{#                        <a class="btn btn-outline-secondary me-2" href="{{ path('book_edit', {id: book.id}) }}">Edit</a>#}
+{#                        <form action="{{ path('book_delete', {id:book.id}) }}" method="POST">#}
+{#                            <button type="submit" class="btn btn-outline-danger">Delete</button>#}
+{#                        </form>#}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a class="btn btn-outline-dark me-2" href="{{ path('author_index') }}">Back</a>
+
+{% endblock %}
