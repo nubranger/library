@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Authors list{% endblock %}
+
+{% block body %}
+    <h1>Authors</h1>
+    <table class="table table-success table-striped">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Name</th>
+            <th scope="col">Surname</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for author in authors %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ author.name }}</td>
+                <td>{{ author.surname }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-outline-warning me-2" href="{{ path('author_edit', {id: author.id}) }}">Edit</a>
+                        <form action="{{ path('author_delete', {id:author.id}) }}" method="POST">
+                            <button type="submit" class="btn btn-outline-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
