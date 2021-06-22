@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Author;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +14,28 @@ class AuthorController extends AbstractController
     /**
      * @Route("/author", name="author_index", methods={"GET"})
      */
-    public function index(): Response
+    public function index(Request $r): Response
     {
+//        $authors = $this->getDoctrine()
+//            ->getRepository(Author::class)
+//            ->findAll();
+
         $authors = $this->getDoctrine()
-            ->getRepository(Author::class)
-            ->findAll();
+            ->getRepository(Author::class);
+
+        if ($r->query->get('sort') == 'name_az')
+            $authors = $authors->findBy([], ['name' => 'asc']);
+        elseif ($r->query->get('sort') == 'name_za')
+            $authors = $authors->findBy([], ['name' => 'desc']);
+        elseif ($r->query->get('sort') == 'surname_az')
+            $authors = $authors->findBy([], ['surname' => 'asc']);
+        elseif ($r->query->get('sort') == 'surname_za')
+            $authors = $authors->findBy([], ['surname' => 'desc']);
+        else $authors = $authors->findAll();
 
         return $this->render('author/index.html.twig', [
-            'authors' => $authors
+            'authors' => $authors,
+            'sortBy' => $r->query->get('sort') ?? 'default'
         ]);
     }
 
@@ -92,6 +107,12 @@ class AuthorController extends AbstractController
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
             ->find($id);
+
+        if ($author->getBooks()->count() > 0) {
+//            return new Response("Author {$author->getName()} {$author->getSurname()} has {$author->getBooks()->count()}");
+            throw new Exception("Can't delete: Author {$author->getName()} {$author->getSurname()} has {$author->getBooks()->count()} books");
+
+        }
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($author);

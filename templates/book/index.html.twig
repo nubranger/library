@@ -4,6 +4,19 @@
 
 {% block body %}
     <h1>Books</h1>
+    <div class="p-2 float-end">
+        <form action="{{ path('book_index') }}" method="GET">
+            <div class="input-group">
+                <span class="input-group-text" id="book_sort">List order by</span>
+                <select class="form-select" id="book_sort" name="sort">
+                    <option value="default">Default</option>
+                    <option value="title_az" {% if sortBy == 'title_az' %} selected {% endif %}>Title a-z</option>
+                    <option value="title_za" {% if sortBy == 'title_za' %} selected {% endif %}>Title z-a</option>
+                </select>
+                <button class="btn btn-outline-dark" type="submit">Sort</button>
+            </div>
+        </form>
+    </div>
     <table class="table table-success table-striped">
         <thead>
         <tr>

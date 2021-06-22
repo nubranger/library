@@ -22,9 +22,10 @@
             <div class="col-md-6">
                 <label for="book_author" class="form-label">Author</label>
                 <select name="book_author_id" id="book_author" class="form-select">
-                    <option value="{{ book.author.id }}" selected>{{ book.author.name }} {{ book.author.surname }}</option>
                     {% for author in authors %}
-                        <option value="{{ author.id }}">{{ author.name }} {{ author.surname }}</option>
+                        <option value="{{ author.id }}" {% if author.id == book.author.id %} selected {% endif %}>
+                            {{ author.name }} {{ author.surname }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -38,7 +39,7 @@
         <div class="row">
             <div class="col-md-6">
                 <label for="book_about" class="form-label">About</label>
-                <input class="form-control" type="text" name="book_about" id="book_about" value="{{ book.about }}">
+                <textarea class="form-control" placeholder="About book" id="book_about">{{ book.about }}</textarea>
             </div>
         </div>
         <div class="row mt-2">
