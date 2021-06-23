@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function Symfony\Component\String\b;
 
 class BookController extends AbstractController
 {
@@ -16,26 +17,36 @@ class BookController extends AbstractController
      */
     public function index(Request $r): Response
     {
-//        $books = $this->getDoctrine()
-//            ->getRepository(Book::class)
-//            ->findAll();
 
-        $books = $this->getDoctrine()
-            ->getRepository(Book::class);
+        $authors = $this->getDoctrine()
+            ->getRepository(Author::class)
+            ->findAll();
+
+        $books = $this->getDoctrine()->getRepository(Book::class);
+
 
         if ($r->query->get('sort') == 'title_az')
             $books = $books->findBy([], ['title' => 'asc']);
         elseif ($r->query->get('sort') == 'title_za')
             $books = $books->findBy([], ['title' => 'desc']);
-        else $books = $books->findAll();
+        elseif ($r->query->get('author_id') !== null && $r->query->get('author_id') != 0) {
+            $author = $this->getDoctrine()->
+            getRepository(Author::class)->
+            find($r->query->get('author_id'));
 
-        $this->getDoctrine()
-            ->getRepository(Author::class)
-            ->findAll();
+            $books = $author->getBooks();
+        }
+        elseif ($r->query->get('author_id') == 0)
+            $books = $books->findAll();
+        else
+            $books = $books->findAll();
+
 
         return $this->render('book/index.html.twig', [
             'books' => $books,
-            'sortBy' => $r->query->get('sort') ?? 'default'
+            'sortBy' => $r->query->get('sort') ?? 'default',
+            'authors' => $authors,
+            'authorId' => $r->query->get('author_id') ?? 0
         ]);
     }
 

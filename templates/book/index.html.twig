@@ -17,6 +17,20 @@
             </div>
         </form>
     </div>
+    <div class="p-2 float-end">
+        <form action="{{ path('book_index') }}" method="GET">
+            <div class="input-group">
+                <span class="input-group-text" id="book_filter">Filter list by</span>
+                <select name="author_id" id="book_filter" name="filter">
+                    <option value="0">View all</option>
+                    {% for author in authors %}
+                        <option value="{{ author.id }}" {% if authorId == author.id %} selected {% endif %}>{{ author.name }} {{ author.surname }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-outline-dark" type="submit">Filter</button>
+            </div>
+        </form>
+    </div>
     <table class="table table-success table-striped">
         <thead>
         <tr>
@@ -33,7 +47,9 @@
             <tr>
                 <th scope="row">{{ loop.index }}</th>
                 <td>{{ book.title }}</td>
-                <td><a href="{{ path('author_books', {id: book.author.id}) }}">{{ book.author.name }} {{ book.author.surname }}</a> </td>
+                <td>
+                    <a href="{{ path('author_books', {id: book.author.id}) }}">{{ book.author.name }} {{ book.author.surname }}</a>
+                </td>
                 <td>{{ book.isbn }}</td>
                 <td>{{ book.pages }}</td>
                 <td>
