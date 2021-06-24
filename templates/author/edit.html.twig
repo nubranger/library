@@ -10,21 +10,18 @@
             <div class="col-md-6">
                 <label for="author_name" class="form-label">Name</label>
                 <input class="form-control" type="text" name="author_name" value="{{ author.name }}" id="author_name">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
                 <label for="author_surname" class="form-label">Surname</label>
                 <input class="form-control" type="text" name="author_surname" value="{{ author.surname }}"
                        id="author_surname">
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-12">
-                <div class="btn-group" role="group">
+                <div class="btn-group mt-2" role="group">
                     <button type="submit" class="btn btn-outline-primary me-2">Save</button>
                     <a class="btn btn-outline-dark me-2" href="{{ path('author_index') }}">Back</a>
                 </div>
+            </div>
+            <div class="col-md-6 mt-2">
+                {% if errors is defined and errors|length > 0 %}
+                    {% include 'errors/validation.html.twig' %}
+                {% endif %}
             </div>
         </div>
     </form>

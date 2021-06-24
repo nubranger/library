@@ -1,0 +1,9 @@
+<div class="alert alert-danger" role="alert">
+    <h3 class="alert-heading">Error:</h3>
+    <ul>
+        {% for error in errors %}
+            <p>{{ error }}</p>
+            <hr>
+        {% endfor %}
+    </ul>
+</div>

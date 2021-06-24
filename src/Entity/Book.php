@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\BookRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
@@ -19,21 +20,31 @@ class Book
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="Title should not be blank.")
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 255,
+     *      minMessage = "Title must be at least {{ limit }} characters long.",
+     *      maxMessage = "Title cannot be longer than {{ limit }} characters."
+     * )
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Assert\NotBlank(message="ISBN should not be blank.")
      */
     private $isbn;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Assert\NotBlank(message="Pages should not be blank.")
      */
     private $pages;
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank(message="About should not be blank.")
      */
     private $about;
 

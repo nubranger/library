@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use function Symfony\Component\String\b;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BookController extends AbstractController
 {
@@ -17,13 +17,11 @@ class BookController extends AbstractController
      */
     public function index(Request $r): Response
     {
-
         $authors = $this->getDoctrine()
             ->getRepository(Author::class)
             ->findAll();
 
         $books = $this->getDoctrine()->getRepository(Book::class);
-
 
         if ($r->query->get('sort') == 'title_az')
             $books = $books->findBy([], ['title' => 'asc']);
@@ -33,41 +31,40 @@ class BookController extends AbstractController
             $author = $this->getDoctrine()->
             getRepository(Author::class)->
             find($r->query->get('author_id'));
-
             $books = $author->getBooks();
-        }
-        elseif ($r->query->get('author_id') == 0)
+        } elseif ($r->query->get('author_id') == 0)
             $books = $books->findAll();
         else
             $books = $books->findAll();
-
 
         return $this->render('book/index.html.twig', [
             'books' => $books,
             'sortBy' => $r->query->get('sort') ?? 'default',
             'authors' => $authors,
-            'authorId' => $r->query->get('author_id') ?? 0
+            'authorId' => $r->query->get('author_id') ?? 0,
+            'success' => $r->getSession()->getFlashBag()->get('success', [])
         ]);
     }
 
     /**
      * @Route("/book/create", name="book_create", methods={"GET"})
      */
-    public function create(): Response
+    public function create(Request $r): Response
     {
         $authors = $this->getDoctrine()
             ->getRepository(Author::class)
             ->findAll();
 
         return $this->render('book/create.html.twig', [
-            'authors' => $authors
+            'authors' => $authors,
+            'errors' => $r->getSession()->getFlashBag()->get('errors', [])
         ]);
     }
 
     /**
      * @Route("/book/store", name="book_store", methods={"POST"})
      */
-    public function store(request $r): Response
+    public function store(Request $r, ValidatorInterface $validator): Response
     {
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
@@ -81,9 +78,19 @@ class BookController extends AbstractController
             ->setAbout($r->request->get('book_about'))
             ->setAuthor($author);
 
+        $errors = $validator->validate($book);
+        if (count($errors) > 0) {
+            foreach ($errors as $error) {
+                $r->getSession()->getFlashBag()->add('errors', $error->getMessage());
+            }
+            return $this->redirectToRoute('book_create');
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($book);
         $entityManager->flush();
+
+        $r->getSession()->getFlashBag()->add('success', "Book {$book->getTitle()} was added.");
 
         return $this->redirectToRoute('book_index');
     }
@@ -91,7 +98,7 @@ class BookController extends AbstractController
     /**
      * @Route("/book/edit/{id}", name="book_edit", methods={"GET"})
      */
-    public function edit(int $id): Response
+    public function edit(Request $r, $id): Response
     {
         $book = $this->getDoctrine()
             ->getRepository(Book::class)
@@ -103,15 +110,15 @@ class BookController extends AbstractController
 
         return $this->render('book/edit.html.twig', [
             'book' => $book,
-            'authors' => $authors
+            'authors' => $authors,
+            'errors' => $r->getSession()->getFlashBag()->get('errors', [])
         ]);
     }
-
 
     /**
      * @Route("/book/update/{id}", name="book_update", methods={"POST"})
      */
-    public function update(request $r, $id): Response
+    public function update(Request $r, ValidatorInterface $validator, $id): Response
     {
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
@@ -128,9 +135,19 @@ class BookController extends AbstractController
             ->setAbout($r->request->get('book_about'))
             ->setAuthor($author);
 
+        $errors = $validator->validate($book);
+        if (count($errors) > 0) {
+            foreach ($errors as $error) {
+                $r->getSession()->getFlashBag()->add('errors', $error->getMessage());
+            }
+            return $this->redirectToRoute('book_edit', ['id' => $id]);
+        }
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($book);
         $entityManager->flush();
+
+        $r->getSession()->getFlashBag()->add('success', "Book {$book->getTitle()} was updated.");
 
         return $this->redirectToRoute('book_index');
     }
@@ -138,7 +155,7 @@ class BookController extends AbstractController
     /**
      * @Route("/book/delete/{id}", name="book_delete", methods={"POST"})
      */
-    public function delete($id): Response
+    public function delete(Request $r, $id): Response
     {
         $book = $this->getDoctrine()
             ->getRepository(Book::class)
@@ -147,6 +164,8 @@ class BookController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($book);
         $entityManager->flush();
+
+        $r->getSession()->getFlashBag()->add('success', "Book {$book->getTitle()} was deleted.");
 
         return $this->redirectToRoute('book_index');
     }
