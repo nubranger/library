@@ -38,7 +38,7 @@ class Book
 
     /**
      * @ORM\Column(type="smallint")
-     * @Assert\NotBlank(message="Pages should not be blank.")
+     * @Assert\Positive(message="Pages should be a positive number.")
      */
     private $pages;
 

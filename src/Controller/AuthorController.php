@@ -52,6 +52,11 @@ class AuthorController extends AbstractController
      */
     public function store(Request $r, ValidatorInterface $validator): Response
     {
+        $submittedToken = $r->request->get('token');
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            $r->getSession()->getFlashBag()->add('errors', 'Invalid token.');
+        }
+
         $author = new Author;
         $author->
         setName($r->request->get('author_name'))->
@@ -62,6 +67,10 @@ class AuthorController extends AbstractController
             foreach ($errors as $error) {
                 $r->getSession()->getFlashBag()->add('errors', $error->getMessage());
             }
+            return $this->redirectToRoute('author_create');
+        }
+
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
             return $this->redirectToRoute('author_create');
         }
 
@@ -94,6 +103,11 @@ class AuthorController extends AbstractController
      */
     public function update(Request $r, ValidatorInterface $validator, $id): Response
     {
+        $submittedToken = $r->request->get('token');
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            $r->getSession()->getFlashBag()->add('errors', 'Invalid token.');
+        }
+
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
             ->find($id);
@@ -110,6 +124,10 @@ class AuthorController extends AbstractController
             }
             return $this->redirectToRoute('author_edit', ['id' => $id]);
         }
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            return $this->redirectToRoute('author_edit', ['id' => $id]);
+        }
+
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($author);

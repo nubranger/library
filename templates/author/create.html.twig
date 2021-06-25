@@ -14,6 +14,7 @@
                 <input class="form-control" type="text" name="author_surname" id="author_surname">
                 <div class="btn-group mt-2" role="group">
                     <button type="submit" class="btn btn-outline-primary me-2">Add</button>
+                    <input type="hidden" name="token" value="{{ csrf_token('') }}"/>
                     <a class="btn btn-outline-dark me-2" href="{{ path('author_index') }}">Back</a>
                 </div>
             </div>

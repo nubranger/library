@@ -66,6 +66,11 @@ class BookController extends AbstractController
      */
     public function store(Request $r, ValidatorInterface $validator): Response
     {
+        $submittedToken = $r->request->get('token');
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            $r->getSession()->getFlashBag()->add('errors', 'Invalid token.');
+        }
+
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
             ->find($r->request->get('book_author_id'));
@@ -85,6 +90,11 @@ class BookController extends AbstractController
             }
             return $this->redirectToRoute('book_create');
         }
+
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            return $this->redirectToRoute('book_create');
+        }
+
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($book);
@@ -120,6 +130,12 @@ class BookController extends AbstractController
      */
     public function update(Request $r, ValidatorInterface $validator, $id): Response
     {
+        $submittedToken = $r->request->get('token');
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            $r->getSession()->getFlashBag()->add('errors', 'Invalid token.');
+        }
+
+
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
             ->find($r->request->get('book_author_id'));
@@ -142,6 +158,11 @@ class BookController extends AbstractController
             }
             return $this->redirectToRoute('book_edit', ['id' => $id]);
         }
+
+        if (!$this->isCsrfTokenValid('', $submittedToken)) {
+            return $this->redirectToRoute('book_edit', ['id'=> $id]);
+        }
+
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($book);
