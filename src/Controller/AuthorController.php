@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Author;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,15 +20,21 @@ class AuthorController extends AbstractController
         $authors = $this->getDoctrine()
             ->getRepository(Author::class);
 
-        if ($r->query->get('sort') == 'name_az')
+        if ($r->query->get('sort') === 'name_az') {
             $authors = $authors->findBy([], ['name' => 'asc']);
-        elseif ($r->query->get('sort') == 'name_za')
+        }
+        elseif ($r->query->get('sort') === 'name_za') {
             $authors = $authors->findBy([], ['name' => 'desc']);
-        elseif ($r->query->get('sort') == 'surname_az')
+        }
+        elseif ($r->query->get('sort') === 'surname_az') {
             $authors = $authors->findBy([], ['surname' => 'asc']);
-        elseif ($r->query->get('sort') == 'surname_za')
+        }
+        elseif ($r->query->get('sort') === 'surname_za') {
             $authors = $authors->findBy([], ['surname' => 'desc']);
-        else $authors = $authors->findAll();
+        }
+        else {
+            $authors = $authors->findAll();
+        }
 
         return $this->render('author/index.html.twig', [
             'authors' => $authors,
@@ -39,6 +46,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/author/create", name="author_create", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function create(Request $r): Response
     {
@@ -49,6 +57,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/author/store", name="author_store", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function store(Request $r, ValidatorInterface $validator): Response
     {
@@ -85,6 +94,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/author/edit/{id}", name="author_edit", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function edit(Request $r, $id): Response
     {
@@ -100,6 +110,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/author/update/{id}", name="author_update", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function update(Request $r, ValidatorInterface $validator, $id): Response
     {
@@ -140,6 +151,7 @@ class AuthorController extends AbstractController
 
     /**
      * @Route("/author/delete/{id}", name="author_delete", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function delete(Request $r, $id)
     {

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Author;
 use App\Entity\Book;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,19 +24,23 @@ class BookController extends AbstractController
 
         $books = $this->getDoctrine()->getRepository(Book::class);
 
-        if ($r->query->get('sort') == 'title_az')
+        if ($r->query->get('sort') === 'title_az') {
             $books = $books->findBy([], ['title' => 'asc']);
-        elseif ($r->query->get('sort') == 'title_za')
+        }
+        elseif ($r->query->get('sort') === 'title_za') {
             $books = $books->findBy([], ['title' => 'desc']);
+        }
         elseif ($r->query->get('author_id') !== null && $r->query->get('author_id') != 0) {
             $author = $this->getDoctrine()->
             getRepository(Author::class)->
             find($r->query->get('author_id'));
             $books = $author->getBooks();
-        } elseif ($r->query->get('author_id') == 0)
+        } elseif ($r->query->get('author_id') === 0) {
             $books = $books->findAll();
-        else
+        }
+        else {
             $books = $books->findAll();
+        }
 
         return $this->render('book/index.html.twig', [
             'books' => $books,
@@ -48,6 +53,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/create", name="book_create", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function create(Request $r): Response
     {
@@ -63,12 +69,21 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/store", name="book_store", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function store(Request $r, ValidatorInterface $validator): Response
     {
         $submittedToken = $r->request->get('token');
         if (!$this->isCsrfTokenValid('', $submittedToken)) {
             $r->getSession()->getFlashBag()->add('errors', 'Invalid token.');
+        }
+
+        $authors = $this->getDoctrine()
+            ->getRepository(Author::class)->findAll();
+
+        if (count($authors) === 0) {
+            $r->getSession()->getFlashBag()->add('errors', 'Add author first.');
+            return $this->redirectToRoute('book_create');
         }
 
         $author = $this->getDoctrine()
@@ -107,6 +122,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/edit/{id}", name="book_edit", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function edit(Request $r, $id): Response
     {
@@ -127,6 +143,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/update/{id}", name="book_update", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function update(Request $r, ValidatorInterface $validator, $id): Response
     {
@@ -175,6 +192,7 @@ class BookController extends AbstractController
 
     /**
      * @Route("/book/delete/{id}", name="book_delete", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function delete(Request $r, $id): Response
     {

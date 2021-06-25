@@ -49,7 +49,7 @@ class Book
     private $about;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Author::class, inversedBy="books")
+     * @ORM\ManyToOne(targetEntity=Author::class, inversedBy="books", cascade={"persist"})
      */
     private $author;
 

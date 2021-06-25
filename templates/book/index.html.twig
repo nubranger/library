@@ -73,7 +73,9 @@
             <th scope="col">Author name</th>
             <th scope="col">ISBN</th>
             <th scope="col">Pages</th>
+            {% if is_granted('ROLE_ADMIN') %}
             <th scope="col">Actions</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -86,6 +88,7 @@
                 </td>
                 <td>{{ book.isbn }}</td>
                 <td>{{ book.pages }}</td>
+                {% if is_granted('ROLE_ADMIN') %}
                 <td>
                     <div class="btn-group" role="group">
                         <a class="btn btn-outline-secondary me-2" href="{{ path('book_edit', {id: book.id}) }}">Edit</a>
@@ -94,6 +97,7 @@
                         </form>
                     </div>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
