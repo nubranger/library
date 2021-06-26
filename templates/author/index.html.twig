@@ -93,4 +93,7 @@
         </tbody>
     </table>
 
+    {% if authors is empty %}
+        <p>There are no authors to show.</p>
+    {% endif %}
 {% endblock %}

@@ -74,7 +74,7 @@
             <th scope="col">ISBN</th>
             <th scope="col">Pages</th>
             {% if is_granted('ROLE_ADMIN') %}
-            <th scope="col">Actions</th>
+                <th scope="col">Actions</th>
             {% endif %}
         </tr>
         </thead>
@@ -89,18 +89,23 @@
                 <td>{{ book.isbn }}</td>
                 <td>{{ book.pages }}</td>
                 {% if is_granted('ROLE_ADMIN') %}
-                <td>
-                    <div class="btn-group" role="group">
-                        <a class="btn btn-outline-secondary me-2" href="{{ path('book_edit', {id: book.id}) }}">Edit</a>
-                        <form action="{{ path('book_delete', {id:book.id}) }}" method="POST">
-                            <button type="submit" class="btn btn-outline-danger">Delete</button>
-                        </form>
-                    </div>
-                </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-outline-secondary me-2"
+                               href="{{ path('book_edit', {id: book.id}) }}">Edit</a>
+                            <form action="{{ path('book_delete', {id:book.id}) }}" method="POST">
+                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
                 {% endif %}
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    {% if books is empty %}
+        <p class="empty">There are no books to show.</p>
+    {% endif %}
 
 {% endblock %}

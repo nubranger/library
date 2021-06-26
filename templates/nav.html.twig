@@ -1,4 +1,6 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+{% set route_name = app.request.attributes.get('_route') %}
+
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #c7dbd2;">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
             <img src="{{ asset('build/images/book.png') }}" alt="" width="50" height="50"
@@ -12,20 +14,24 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ path('book_index') }}">Book list</a>
+                    <a class="nav-link {% if route_name == 'book_index' %} active {% endif %}" aria-current="page"
+                       href="{{ path('book_index') }}">Book list</a>
                 </li>
                 {% if is_granted('ROLE_ADMIN') %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('book_create') }}">Add Book</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if route_name == 'book_create' %} active {% endif %}"
+                           href="{{ path('book_create') }}">Add Book</a>
+                    </li>
                 {% endif %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('author_index') }}">Author list</a>
+                    <a class="nav-link {% if route_name == 'author_index' %} active {% endif %}"
+                       href="{{ path('author_index') }}">Author list</a>
                 </li>
                 {% if is_granted('ROLE_ADMIN') %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('author_create') }}">Add Author</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if route_name == 'author_create' %} active {% endif %}"
+                           href="{{ path('author_create') }}">Add Author</a>
+                    </li>
                 {% endif %}
 
             </ul>
