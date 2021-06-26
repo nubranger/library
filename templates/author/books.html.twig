@@ -8,11 +8,12 @@
         <thead>
         <tr>
             <th scope="col"></th>
+            <th scope="col"></th>
             <th scope="col">Title</th>
             <th scope="col">ISBN</th>
             <th scope="col">Pages</th>
             {% if is_granted('ROLE_ADMIN') %}
-            <th scope="col">Actions</th>
+                <th scope="col">Actions</th>
             {% endif %}
         </tr>
         </thead>
@@ -20,18 +21,28 @@
         {% for book in books %}
             <tr>
                 <th scope="row">{{ loop.index }}</th>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        {% if book.image %}
+                            <img src="{{ book.imagePath }}" alt="{{ book.image }}" width="100" height="100">
+                        {% else %}
+                            <img src="{{ asset('./build/images/noimage.jpg') }}" alt="" width="100" height="100">
+                        {% endif %}
+                    </div>
+                </td>
                 <td>{{ book.title }}</td>
                 <td>{{ book.isbn }}</td>
                 <td>{{ book.pages }}</td>
                 {% if is_granted('ROLE_ADMIN') %}
-                <td>
-                    <div class="btn-group" role="group">
-                         <a class="btn btn-outline-secondary me-2" href="{{ path('book_edit', {id: book.id}) }}">Edit</a>
-                         <form action="{{ path('book_delete', {id:book.id}) }}" method="POST">
-                         <button type="submit" class="btn btn-outline-danger">Delete</button>
-                         </form>
-                    </div>
-                </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-outline-secondary me-2"
+                               href="{{ path('book_edit', {id: book.id}) }}">Edit</a>
+                            <form action="{{ path('book_delete', {id:book.id}) }}" method="POST">
+                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
                 {% endif %}
             </tr>
         {% endfor %}

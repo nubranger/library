@@ -4,11 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Author;
 use App\Entity\Book;
+use App\Service\UploaderHelper;
+use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Sluggable\Util\Urlizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BookController extends AbstractController
@@ -26,19 +30,16 @@ class BookController extends AbstractController
 
         if ($r->query->get('sort') === 'title_az') {
             $books = $books->findBy([], ['title' => 'asc']);
-        }
-        elseif ($r->query->get('sort') === 'title_za') {
+        } elseif ($r->query->get('sort') === 'title_za') {
             $books = $books->findBy([], ['title' => 'desc']);
-        }
-        elseif ($r->query->get('author_id') !== null && $r->query->get('author_id') != 0) {
+        } elseif ($r->query->get('author_id') !== null && $r->query->get('author_id') != 0) {
             $author = $this->getDoctrine()->
             getRepository(Author::class)->
             find($r->query->get('author_id'));
             $books = $author->getBooks();
         } elseif ($r->query->get('author_id') === 0) {
             $books = $books->findAll();
-        }
-        else {
+        } else {
             $books = $books->findAll();
         }
 
@@ -71,7 +72,7 @@ class BookController extends AbstractController
      * @Route("/book/store", name="book_store", methods={"POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function store(Request $r, ValidatorInterface $validator): Response
+    public function store(Request $r, ValidatorInterface $validator, UploaderHelper $uploaderHelper): Response
     {
         $submittedToken = $r->request->get('token');
         if (!$this->isCsrfTokenValid('', $submittedToken)) {
@@ -91,6 +92,32 @@ class BookController extends AbstractController
             ->find($r->request->get('book_author_id'));
 
         $book = new Book;
+
+        $uploadedFile = $r->files->get('image');
+        if ($uploadedFile) {
+
+            $violations = $validator->validate(
+                $uploadedFile,
+                new File([
+                    'maxSize' => '1M',
+                    'mimeTypes' => [
+                        'image/jpg',
+                        'image/jpeg'
+//                        'image/*'
+                    ]
+                ])
+            );
+
+            if ($violations->count() > 0) {
+                $violation = $violations[0];
+                $r->getSession()->getFlashBag()->add('errors', $violation->getMessage());
+                return $this->redirectToRoute('book_create');
+            }
+
+            $newFilename = $uploaderHelper->uploadBookImage($uploadedFile);
+            $book->setImage($newFilename);
+        }
+
         $book
             ->setTitle($r->request->get('book_title'))
             ->setIsbn($r->request->get('book_isbn'))
@@ -145,13 +172,12 @@ class BookController extends AbstractController
      * @Route("/book/update/{id}", name="book_update", methods={"POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function update(Request $r, ValidatorInterface $validator, $id): Response
+    public function update(Request $r, ValidatorInterface $validator, $id, UploaderHelper $uploaderHelper): Response
     {
         $submittedToken = $r->request->get('token');
         if (!$this->isCsrfTokenValid('', $submittedToken)) {
             $r->getSession()->getFlashBag()->add('errors', 'Invalid token.');
         }
-
 
         $author = $this->getDoctrine()
             ->getRepository(Author::class)
@@ -160,6 +186,31 @@ class BookController extends AbstractController
         $book = $this->getDoctrine()
             ->getRepository(Book::class)
             ->find($id);
+
+        $uploadedFile = $r->files->get('image');
+        if ($uploadedFile) {
+
+            $violations = $validator->validate(
+                $uploadedFile,
+                new File([
+                    'maxSize' => '1M',
+                    'mimeTypes' => [
+                        'image/jpg',
+                        'image/jpeg'
+//                        'image/*'
+                    ]
+                ])
+            );
+
+            if ($violations->count() > 0) {
+                $violation = $violations[0];
+                $r->getSession()->getFlashBag()->add('errors', $violation->getMessage());
+                return $this->redirectToRoute('book_edit', ['id' => $id]);
+            }
+
+            $newFilename = $uploaderHelper->uploadBookImage($uploadedFile);
+            $book->setImage($newFilename);
+        }
 
         $book
             ->setTitle($r->request->get('book_title'))
@@ -177,7 +228,7 @@ class BookController extends AbstractController
         }
 
         if (!$this->isCsrfTokenValid('', $submittedToken)) {
-            return $this->redirectToRoute('book_edit', ['id'=> $id]);
+            return $this->redirectToRoute('book_edit', ['id' => $id]);
         }
 
 
@@ -207,5 +258,19 @@ class BookController extends AbstractController
         $r->getSession()->getFlashBag()->add('success', "Book {$book->getTitle()} was deleted.");
 
         return $this->redirectToRoute('book_index');
+    }
+
+    /**
+     * @Route("/book/view/{id}", name="book_view", methods={"GET"})
+     */
+    public function bookView($id): Response
+    {
+        $book = $this->getDoctrine()
+            ->getRepository(Book::class)
+            ->find($id);
+
+        return $this->render('book/book.html.twig', [
+            'book' => $book,
+        ]);
     }
 }

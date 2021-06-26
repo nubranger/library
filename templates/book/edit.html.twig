@@ -5,9 +5,13 @@
 {% block body %}
     <h1>Edit Book</h1>
 
-    <form action="{{ path('book_update', {id:book.id}) }}) }}" method="POST">
+    <form action="{{ path('book_update', {id:book.id}) }}" method="POST" enctype="multipart/form-data">
         <div class="row">
             <div class="col-md-6">
+                <h6>Upload book image</h6>
+                <input type="file" name="image">
+                <hr>
+
                 <label for="book_title" class="form-label">Title</label>
                 <input class="form-control" type="text" name="book_title" id="book_title" value="{{ book.title }}">
                 <label for="book_isbn" class="form-label">ISBN</label>

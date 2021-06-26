@@ -69,6 +69,7 @@
         <thead>
         <tr>
             <th scope="col"></th>
+            <th scope="col"></th>
             <th scope="col">Title</th>
             <th scope="col">Author name</th>
             <th scope="col">ISBN</th>
@@ -82,7 +83,18 @@
         {% for book in books %}
             <tr>
                 <th scope="row">{{ loop.index }}</th>
-                <td>{{ book.title }}</td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        {% if book.image %}
+                            <img src="{{ book.imagePath }}" alt="{{ book.image }}" width="100" height="100">
+                        {% else %}
+                            <img src="{{ asset('build/images/noimage.jpg') }}" alt="" width="100" height="100">
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <a href="{{ path('book_view', {id: book.id}) }}">{{ book.title }}</a>
+                </td>
                 <td>
                     <a href="{{ path('author_books', {id: book.author.id}) }}">{{ book.author.name }} {{ book.author.surname }}</a>
                 </td>
