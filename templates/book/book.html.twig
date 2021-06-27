@@ -12,7 +12,7 @@
                     {% if book.image %}
                         <img class="img-fluid" src="{{ book.imagePath }}" alt="{{ book.image }}">
                     {% else %}
-                        <img src="{{ asset('./build/images/noimage.jpg') }}" alt="">
+                        <img class="img-fluid" src="{{ asset('./build/images/noimage.jpg') }}" alt="noimage">
                     {% endif %}
                 </div>
             </div>
